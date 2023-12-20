@@ -3,14 +3,14 @@ from data import load_user_data, save_user_data
 from secret_santa import welcome_message, shuffle_users
 
 # todo: считывать токен из ввода
-# TOKEN = input("Вставьте свой токен: ")
-TOKEN = "TOKEN"
+TOKEN = input("Вставьте свой токен: ")
+# TOKEN = "TOKEN"
 bot = telebot.TeleBot(TOKEN)
 
 # todo: считывать количество участников из ввода
-# users_total = int(input("Введите количество участников: "))
-users_total = 6
-users_sent_gift = 0
+users_total = int(input("Введите количество участников: "))
+# users_total = 6
+# users_sent_gift = 0
 
 data_path = "users.json"
 user_data = load_user_data(data_path)
