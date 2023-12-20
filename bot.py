@@ -1,6 +1,6 @@
 import telebot
 from data import load_user_data, save_user_data
-from secret_santa import welcome_message, shuffle_users
+from secret_santa import welcome_message, resources, shuffle_users
 
 # todo: считывать токен из ввода
 TOKEN = input("Вставьте свой токен: ")
@@ -10,7 +10,7 @@ bot = telebot.TeleBot(TOKEN)
 # todo: считывать количество участников из ввода
 users_total = int(input("Введите количество участников: "))
 # users_total = 6
-# users_sent_gift = 0
+users_sent_gift = 0
 
 data_path = "users.json"
 user_data = load_user_data(data_path)
@@ -48,7 +48,9 @@ def get_preferences(message):
     user_data[message.chat.id]["preferences"] = message.text
     # Сохраняем данные пользователя
     save_user_data(user_data, data_path)
-    bot.send_message(message.chat.id, "Спасибо за ответы! Теперь ждем всех участников!")
+    bot.send_message(message.chat.id, "Спасибо за ответы! Теперь ждем всех участников!\n"
+                                      "А пока ты можешь ознакомиться с ресурсами, "
+                                      "которые помогут тебе сгенерировать подаро. Напиши /resources")
     if len(user_data) == users_total:
         user_data = shuffle_users(user_data)
         # Сохраняем данные пользователя
@@ -63,8 +65,15 @@ def send_info(user_data):
                                   f"У меня для тебя хорошие новости.")
         bot.send_message(user_id, f"Все участники зарегистрированы, начинаем розыгрыш!")
         bot.send_message(user_id, f"Твой счастливчик - {user_data[user['send_to']]['name']}!\n"
-                                  f"Вот что ему нравится: {user_data[user['send_to']]['preferences']}"
-                                  f"Отправь открытку для своего подопечного ответным сообщением")
+                                  f"Вот что ему нравится: {user_data[user['send_to']]['preferences']}\n"
+                                  f"Отправь подарок для своего подопечного ответным сообщением.\n"
+                                  f"Это может быть картинка, аудио или даже видео!")
+
+
+# Обработчик команды /resources
+@bot.message_handler(commands=["resources"])
+def resources(message):
+    bot.send_message(message.chat.id, resources, parse_mode='HTML')
 
 
 # Команда для отправки медиа-файлов
