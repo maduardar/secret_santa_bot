@@ -38,9 +38,10 @@ def get_preferences(message):
                                   "preferences": message.text,
                                   "send_to": None, "gift_id": "", "gift_type": ""}
 
-    print(user_data)
     # Сохраняем данные пользователя
     save_user_data(user_data, data_path)
+
+    print(user_data)
 
     bot.send_message(message.chat.id, "Спасибо за ответы! Теперь ждем всех участников!\n"
                                       "А пока ты можешь ознакомиться с ресурсами, "
