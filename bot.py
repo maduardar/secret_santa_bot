@@ -34,16 +34,17 @@ def start(message):
 def get_preferences(message):
     global user_data
     # Инициализируем данные пользователя
-    print(user_data)
     user_data[message.chat.id] = {"name": message.from_user.first_name,
                                   "preferences": message.text,
                                   "send_to": None, "gift_id": "", "gift_type": ""}
+
+    print(user_data)
     # Сохраняем данные пользователя
     save_user_data(user_data, data_path)
 
     bot.send_message(message.chat.id, "Спасибо за ответы! Теперь ждем всех участников!\n"
                                       "А пока ты можешь ознакомиться с ресурсами, "
-                                      "которые помогут тебе сгенерировать подаро. Напиши /resources")
+                                      "которые помогут тебе сгенерировать подарок. Напиши /resources")
     if len(user_data) == users_total:
         user_data = shuffle_users(user_data)
         # Сохраняем данные пользователя
