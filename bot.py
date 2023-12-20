@@ -1,6 +1,6 @@
 import telebot
 from data import load_user_data, save_user_data
-from secret_santa import welcome_message, resources, shuffle_users
+from secret_santa import welcome_message, resources_str, shuffle_users
 
 # todo: считывать токен из ввода
 TOKEN = input("Вставьте свой токен: ")
@@ -19,16 +19,6 @@ user_data = load_user_data(data_path)
 # Обработчик команды /start
 @bot.message_handler(commands=["start"])
 def start(message):
-    global user_data
-    # Считываем данные из файла, если
-    # Инициализируем данные пользователя
-    print(user_data)
-    user_data[message.chat.id] = {"name": message.from_user.first_name,
-                                  "preferences": "",
-                                  "send_to": None, "gift_id": "", "gift_type": ""}
-    # Сохраняем данные пользователя
-    save_user_data(user_data, data_path)
-
     # Отправляем приветственное сообщение
     bot.send_message(message.chat.id, welcome_message)
 
@@ -43,11 +33,14 @@ def start(message):
 
 def get_preferences(message):
     global user_data
-    # Считываем данные из файла, если
     # Инициализируем данные пользователя
-    user_data[message.chat.id]["preferences"] = message.text
+    print(user_data)
+    user_data[message.chat.id] = {"name": message.from_user.first_name,
+                                  "preferences": message.text,
+                                  "send_to": None, "gift_id": "", "gift_type": ""}
     # Сохраняем данные пользователя
     save_user_data(user_data, data_path)
+
     bot.send_message(message.chat.id, "Спасибо за ответы! Теперь ждем всех участников!\n"
                                       "А пока ты можешь ознакомиться с ресурсами, "
                                       "которые помогут тебе сгенерировать подаро. Напиши /resources")
@@ -73,7 +66,7 @@ def send_info(user_data):
 # Обработчик команды /resources
 @bot.message_handler(commands=["resources"])
 def resources(message):
-    bot.send_message(message.chat.id, resources, parse_mode='HTML')
+    bot.send_message(message.chat.id, resources_str, parse_mode='HTML')
 
 
 # Команда для отправки медиа-файлов
@@ -97,7 +90,6 @@ def send_media_files(user_data):
         recipient_id = user['send_to']
         file_id = user['gift_id']
         file_type = user['gift_type']
-        # todo: текст сообщения можно поменять
         bot.send_message(recipient_id, f"Привет, {user_data[recipient_id]['name']}!\n"
                                        f"Тебе тут открытка от твоего секретного санты!")
         if file_type == 'photo':
@@ -106,6 +98,7 @@ def send_media_files(user_data):
             bot.send_video(recipient_id, file_id)
         elif file_type == 'audio':
             bot.send_audio(recipient_id, file_id)
+    save_user_data(dict(), data_path)
 
 
 # Запуск бота
