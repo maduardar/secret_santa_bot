@@ -10,10 +10,18 @@ bot = telebot.TeleBot(TOKEN)
 # todo: считывать количество участников из ввода
 users_total = int(input("Введите количество участников: "))
 # users_total = 6
+
 users_sent_gift = 0
 
 data_path = "users.json"
 user_data = load_user_data(data_path)
+
+bot.set_my_commands(
+    commands=[
+        telebot.types.BotCommand("/start", "Зарероватьгся в игре!"),
+        telebot.types.BotCommand("/resources", "Где можно сгенерировать подарок?"),
+    ],
+)
 
 
 # Обработчик команды /start
@@ -25,7 +33,7 @@ def start(message):
     # Отправляем сообщение с вопросом о предпочтениях
     bot.send_message(message.chat.id,
                      "Чтобы твоему санте было легче сгенерировать открытку, "
-                     "перечисли минимум три вещи, которые тебе нравятся.\n"
+                     "перечисли ответном сообщении минимум три вещи, которые тебе нравятся.\n"
                      "Это может быть твоя любимая еда, любимый цвет, любимый испольнитель "
                      "или что-то другое (фильмы, книги, компьютерные игры, животные, предметы и т.д.)")
     bot.register_next_step_handler(message, get_preferences)
@@ -43,7 +51,7 @@ def get_preferences(message):
 
     print(user_data)
 
-    bot.send_message(message.chat.id, "Спасибо за ответы! Теперь ждем всех участников!\n"
+    bot.send_message(message.chat.id, "Спасибо за ответы! Теперь ждём всех участников!\n"
                                       "А пока ты можешь ознакомиться с ресурсами, "
                                       "которые помогут тебе сгенерировать подарок. Напиши /resources")
     if len(user_data) == users_total:
@@ -57,12 +65,13 @@ def get_preferences(message):
 def send_info(user_data):
     for user_id, user in user_data.items():
         bot.send_message(user_id, f"Итак, {user['name']}, \n"
-                                  f"У меня для тебя хорошие новости.")
-        bot.send_message(user_id, f"Все участники зарегистрированы, начинаем розыгрыш!")
+                                  f"У меня для тебя хорошие новости.\n"
+                                  f"Все участники зарегистрированы, начинаем розыгрыш!")
         bot.send_message(user_id, f"Твой счастливчик - {user_data[user['send_to']]['name']}!\n"
-                                  f"Вот что ему нравится: {user_data[user['send_to']]['preferences']}\n"
-                                  f"Отправь подарок для своего подопечного ответным сообщением.\n"
-                                  f"Это может быть картинка, аудио или даже видео!")
+                                  f"Вот что он(а) любит: {user_data[user['send_to']]['preferences']}\n"
+                                  f"Тебе нужно отправить подарок ответным сообщением.\n"
+                                  f"Это может быть картинка, аудио или даже видео!\n"
+                                  f"Постарайся учесть как можно больше предпочтений.")
 
 
 # Обработчик команды /resources
