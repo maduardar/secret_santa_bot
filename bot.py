@@ -18,7 +18,7 @@ user_data = load_user_data(data_path)
 
 bot.set_my_commands(
     commands=[
-        telebot.types.BotCommand("/start", "Зарероватьгся в игре!"),
+        telebot.types.BotCommand("/start", "Зарегистрироваться в игре!"),
         telebot.types.BotCommand("/resources", "Где можно сгенерировать подарок?"),
     ],
 )
@@ -33,7 +33,7 @@ def start(message):
     # Отправляем сообщение с вопросом о предпочтениях
     bot.send_message(message.chat.id,
                      "Чтобы твоему санте было легче сгенерировать открытку, "
-                     "перечисли ответном сообщении минимум три вещи, которые тебе нравятся.\n"
+                     "перечисли в ответном сообщении минимум три вещи, которые тебе нравятся.\n"
                      "Это может быть твоя любимая еда, любимый цвет, любимый испольнитель "
                      "или что-то другое (фильмы, книги, компьютерные игры, животные, предметы и т.д.)")
     bot.register_next_step_handler(message, get_preferences)
