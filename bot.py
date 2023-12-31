@@ -86,9 +86,14 @@ def send_info(user_data):
                                   f"Постарайся учесть как можно больше предпочтений.")
 
 if len(user_data) == users_total:
-    user_data = shuffle_users(user_data)
-    # Сохраняем данные пользователя
-    save_user_data(user_data, data_path)
+    user_not_assigned = False
+    for user_id, user in user_data.items():
+        if user["send_to"] == None:
+            user_not_assigned = True
+    if user_not_assigned:
+        user_data = shuffle_users(user_data)
+        # Сохраняем данные пользователя
+        save_user_data(user_data, data_path)
     # Отправляем сообщение с информацией о том, кому кто дарит подарок
     send_info(user_data)
 
