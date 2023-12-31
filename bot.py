@@ -11,10 +11,22 @@ bot = telebot.TeleBot(TOKEN)
 users_total = int(input("Введите количество участников: "))
 # users_total = 6
 
-users_sent_gift = 0
+
 
 data_path = "users.json"
 user_data = load_user_data(data_path)
+
+def count_gifts(user_data):
+    users_sent_gift = 0
+    for user_id, user in user_data.items():
+        if user["gift_id"] != "":
+            users_sent_gift += 1
+    return users_sent_gift
+
+
+
+print(count_gifts(user_data))
+users_sent_gift = count_gifts(user_data)
 
 bot.set_my_commands(
     commands=[
@@ -73,6 +85,12 @@ def send_info(user_data):
                                   f"Это может быть картинка, аудио или даже видео!\n"
                                   f"Постарайся учесть как можно больше предпочтений.")
 
+if len(user_data) == users_total:
+    user_data = shuffle_users(user_data)
+    # Сохраняем данные пользователя
+    save_user_data(user_data, data_path)
+    # Отправляем сообщение с информацией о том, кому кто дарит подарок
+    send_info(user_data)
 
 # Обработчик команды /resources
 @bot.message_handler(commands=["resources"])
@@ -84,14 +102,18 @@ def resources(message):
 @bot.message_handler(content_types=['photo', 'video', 'audio'])
 def handle_media_files(message):
     global user_data, users_sent_gift
-    chat_id = message.chat.id
+    chat_id = str(message.chat.id)
+    print(chat_id)
     if chat_id in user_data:
-        file_id = message.document.file_id if message.document else message.photo[-1].file_id
+        print(f"Пришёл подарок от {message.from_user.first_name}")
+        print(message.content_type)
+        file_id = message.document.file_id if message.content_type == "document" else message.audio.file_id if message.content_type == "audio" else message.video.file_id if message.content_type == "video" else message.photo[0].file_id
         user_data[chat_id]['gift_id'] = file_id
         user_data[chat_id]['gift_type'] = message.content_type
+        print(user_data)
         save_user_data(user_data, data_path)
         bot.send_message(chat_id, "Медиа-файл принят!")
-        users_sent_gift += 1
+        users_sent_gift = count_gifts(user_data)
         if users_sent_gift == users_total:
             send_media_files(user_data)
 
